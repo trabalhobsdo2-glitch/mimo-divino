@@ -339,7 +339,7 @@ section { padding-block: clamp(3rem, 6vw, 5.5rem); }
 .hero-actions { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 1.7rem; }
 
 .hero-visual { position: relative; }
-.hero-visual .arch { aspect-ratio: 3 / 3.6; background: #fff; }
+.hero-visual .arch { aspect-ratio: 1 / 1.08; background: #241a15; }
 .hero-visual .glow-pulse { width: 55%; height: 30%; left: 22%; top: 46%; }
 
 .dual-figure {
