@@ -510,10 +510,14 @@ section { padding-block: clamp(3rem, 6vw, 5.5rem); }
 .offer h2, .offer p { color: #fff; }
 .offer p { opacity: 0.92; margin-inline: auto; }
 .offer-price { font-family: var(--font-display); font-size: clamp(2.4rem, 1.8rem + 2vw, 3.2rem); margin: 0.3em 0; font-weight: 600; }
-.offer-grid { display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 1.25rem; max-width: 680px; margin: 2rem auto 0; }
+.offer-grid { display: grid; grid-template-columns: repeat(2, minmax(150px, 1fr)); gap: 1.25rem; max-width: 680px; margin: 2rem auto 0; }
 .offer .btn-accent { background: #fff; color: var(--primary-dark); }
 .offer .btn-accent:hover { background: var(--primary-tint); }
 .offer-note { font-size: 0.85rem; opacity: 0.85; margin-top: 1rem; }
+
+@media (max-width: 480px) {
+  .offer-grid { grid-template-columns: 1fr; max-width: 320px; }
+}
 
 /* ==========================================================================
    Reviews
