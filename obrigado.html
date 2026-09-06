@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido — Mimo Divino</title>
+<link rel="icon" href="assets/images/logo.jpg">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.3 2.4 2.4 5-5.4"/></symbol>
+  <symbol id="icon-cart" viewBox="0 0 24 24"><path d="M3 4h2.2l1 12.2A2 2 0 0 0 8.2 18h9.4a2 2 0 0 0 2-1.7L21 8H6"/><circle cx="9.5" cy="21" r="1.4"/><circle cx="17.5" cy="21" r="1.4"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="1.6"/><path d="M7.5 10.5V7.8a4.5 4.5 0 0 1 9 0v2.7"/></symbol>
+</svg>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">
+      <img src="assets/images/logo.jpg" alt="Mimo Divino">
+      <span class="brand-word">Mimo <span>Divino</span></span>
+    </a>
+    <nav class="main-nav" id="main-nav"></nav>
+    <div class="header-actions">
+      <a href="carrinho.html" class="cart-btn" aria-label="Ver carrinho">
+        <svg class="icon" aria-hidden="true"><use href="#icon-cart"></use></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="container" style="max-width:640px; text-align:center;">
+      <span class="icon-wrap" style="width:4rem;height:4rem;border-radius:50%;background:var(--primary-tint);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+        <svg class="icon" aria-hidden="true" style="width:2rem;height:2rem;"><use href="#icon-check-circle"></use></svg>
+      </span>
+      <h1 id="status-title">Recebemos seu pedido</h1>
+      <p class="lede" id="status-text" style="margin-inline:auto;">Assim que o pagamento for confirmado pelo Mercado Pago, você recebe um e-mail com os detalhes do seu Mimo Divino.</p>
+      <a href="index.html" class="btn btn-primary btn-lg" style="margin-top:1rem;">Voltar à loja</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom" style="margin-top:0;border-top:none;padding-top:0;">
+      <span>© 2026 Mimo Divino. Todos os direitos reservados.</span>
+      <div class="payment-badges">
+        <svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg>
+        <span>Pagamento processado com segurança via Mercado Pago</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script>
+  // Lê o retorno do Mercado Pago (status=approved|pending|failure) e ajusta a mensagem.
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get("status") || params.get("collection_status");
+
+  const titleEl = document.getElementById("status-title");
+  const textEl = document.getElementById("status-text");
+
+  if (status === "approved") {
+    titleEl.textContent = "Pagamento aprovado!";
+    textEl.textContent = "Seu Mimo Divino já está sendo preparado com carinho. Você vai receber um e-mail com os detalhes do pedido e do envio.";
+    clearCart();
+  } else if (status === "pending" || status === "in_process") {
+    titleEl.textContent = "Pagamento em análise";
+    textEl.textContent = "Assim que o pagamento (Pix, boleto ou cartão) for confirmado, você recebe um e-mail com os detalhes do pedido.";
+    clearCart();
+  } else if (status === "failure" || status === "rejected") {
+    titleEl.textContent = "Não foi possível concluir o pagamento";
+    textEl.textContent = "Nenhum valor foi cobrado. Você pode voltar ao carrinho e tentar novamente com outro método de pagamento.";
+  }
+</script>
+</body>
+</html>

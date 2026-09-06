@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrinho — Mimo Divino</title>
+<link rel="icon" href="assets/images/logo.jpg">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 20.2s-7.4-4.6-9.9-9.1C.6 8 1.7 4.6 4.9 3.6c2.1-.7 4.2.1 5.6 1.9l1.5 1.9 1.5-1.9c1.4-1.8 3.5-2.6 5.6-1.9 3.2 1 4.3 4.4 2.8 7.5-2.5 4.5-9.9 9.1-9.9 9.1Z"/></symbol>
+  <symbol id="icon-truck" viewBox="0 0 24 24"><path d="M2.5 6.5h11v10h-11z"/><path d="M13.5 10.5h4l3 3v3h-7z"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></symbol>
+  <symbol id="icon-cart" viewBox="0 0 24 24"><path d="M3 4h2.2l1 12.2A2 2 0 0 0 8.2 18h9.4a2 2 0 0 0 2-1.7L21 8H6"/><circle cx="9.5" cy="21" r="1.4"/><circle cx="17.5" cy="21" r="1.4"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9.5 7V4.8c0-.4.4-.8.9-.8h3.2c.5 0 .9.4.9.8V7"/><path d="M6 7l.8 12.2c0 .9.8 1.6 1.7 1.6h6.9c.9 0 1.7-.7 1.7-1.6L18 7"/><path d="M10.2 11v6M13.8 11v6"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="icon-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></symbol>
+  <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.3 2.4 2.4 5-5.4"/></symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="1.6"/><path d="M7.5 10.5V7.8a4.5 4.5 0 0 1 9 0v2.7"/></symbol>
+  <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3.3 6.4L4 19.5l1.1-3.2A7.9 7.9 0 0 1 4 12Z"/></symbol>
+  <symbol id="icon-camera" viewBox="0 0 24 24"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8 7.5l1.4-2.3h5.2L16 7.5"/><circle cx="12" cy="13.5" r="3.3"/></symbol>
+  <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="1.6"/><path d="m4 7 8 6 8-6"/></symbol>
+  <symbol id="icon-gift" viewBox="0 0 24 24"><rect x="3.5" y="9.5" width="17" height="10.5" rx="1.2"/><path d="M3.5 9.5h17M12 9.5V20"/><path d="M12 9.5c-1.6-4.5-7.7-4.7-7.7-1.2 0 1.7 2 1.2 7.7 1.2Zm0 0c1.6-4.5 7.7-4.7 7.7-1.2 0 1.7-2 1.2-7.7 1.2Z"/></symbol>
+</svg>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">
+      <img src="assets/images/logo.jpg" alt="Mimo Divino">
+      <span class="brand-word">Mimo <span>Divino</span></span>
+    </a>
+    <nav class="main-nav" id="main-nav">
+      <a href="index.html#produtos">Produtos</a>
+      <a href="index.html#como-funciona">Como funciona</a>
+      <a href="index.html#avaliacoes">Avaliações</a>
+      <a href="index.html#faq">Perguntas frequentes</a>
+    </nav>
+    <div class="header-actions">
+      <a href="carrinho.html" class="cart-btn" aria-label="Ver carrinho">
+        <svg class="icon" aria-hidden="true"><use href="#icon-cart"></use></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </a>
+      <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+        <svg class="icon" aria-hidden="true"><use href="#icon-menu"></use></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container page-head">
+    <div class="breadcrumb">
+      <a href="index.html">Início</a>
+      <span>/</span>
+      <span>Carrinho</span>
+    </div>
+    <h1>Seu carrinho</h1>
+  </div>
+
+  <section class="section-tight">
+    <div class="container">
+
+      <div id="cart-filled" class="cart-layout" hidden>
+        <div class="cart-list" id="cart-list"></div>
+
+        <div class="summary-card">
+          <h3 style="margin-bottom:1.2rem;">Resumo do pedido</h3>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="summary-subtotal">R$ 0,00</span>
+          </div>
+          <div class="summary-row">
+            <span>Frete</span>
+            <span>Calculado no checkout</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span id="summary-total">R$ 0,00</span>
+          </div>
+          <a href="checkout.html" class="btn btn-primary btn-lg btn-block" style="margin-top:1.3rem;">Continuar para o checkout</a>
+          <a href="index.html#produtos" class="btn btn-ghost btn-block" style="margin-top:.4rem;">Continuar comprando</a>
+          <p class="summary-note">
+            <svg class="icon" aria-hidden="true" style="width:1em;height:1em;vertical-align:-2px;"><use href="#icon-lock"></use></svg>
+            Pagamento processado com segurança via Mercado Pago.
+          </p>
+        </div>
+      </div>
+
+      <div id="cart-empty" class="cart-empty" hidden>
+        <span class="icon-wrap"><svg class="icon" aria-hidden="true" style="width:1.8rem;height:1.8rem;"><use href="#icon-gift"></use></svg></span>
+        <h2>Seu carrinho está vazio</h2>
+        <p style="margin-inline:auto;">Que tal conhecer a Maria e o Jesus? Cada um com apenas 31 unidades nesta primeira leva.</p>
+        <a href="index.html#produtos" class="btn btn-primary btn-lg" style="margin-top:1rem;">Ver produtos</a>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <img src="assets/images/logo.jpg" alt="Mimo Divino">
+          <span class="brand-word">Mimo <span>Divino</span></span>
+        </a>
+        <p>Carinho que acalma. Presença que conforta.</p>
+        <div class="footer-social">
+          <a href="#" class="btn-icon" aria-label="Falar no WhatsApp"><svg class="icon" aria-hidden="true"><use href="#icon-chat"></use></svg></a>
+          <a href="#" class="btn-icon" aria-label="Seguir no Instagram"><svg class="icon" aria-hidden="true"><use href="#icon-camera"></use></svg></a>
+          <a href="mailto:contato@mimodivino.com.br" class="btn-icon" aria-label="Enviar e-mail"><svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Loja</h4>
+        <ul>
+          <li><a href="produto-maria.html">Maria</a></li>
+          <li><a href="produto-jesus.html">Jesus</a></li>
+          <li><a href="carrinho.html">Carrinho</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Ajuda</h4>
+        <ul>
+          <li><a href="index.html#faq">Perguntas frequentes</a></li>
+          <li><a href="index.html#como-funciona">Como funciona</a></li>
+          <li><a href="mailto:contato@mimodivino.com.br">Fale conosco</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Institucional</h4>
+        <ul>
+          <li><a href="#">Trocas e devoluções</a></li>
+          <li><a href="#">Política de privacidade</a></li>
+          <li><a href="#">Termos de uso</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Mimo Divino. Todos os direitos reservados.</span>
+      <div class="payment-badges">
+        <svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg>
+        <span>Pagamento processado com segurança via Mercado Pago</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+<script>
+function renderCartPage() {
+  const items = getCartDetailed();
+  const filledEl = document.getElementById("cart-filled");
+  const emptyEl = document.getElementById("cart-empty");
+  const listEl = document.getElementById("cart-list");
+
+  if (!items.length) {
+    filledEl.hidden = true;
+    emptyEl.hidden = false;
+    return;
+  }
+  filledEl.hidden = false;
+  emptyEl.hidden = true;
+
+  listEl.innerHTML = items.map((item) => `
+    <div class="cart-item" data-id="${item.id}">
+      <img src="${item.product.image}" alt="${item.product.name}">
+      <div class="cart-item-info">
+        <h3>${item.product.name}</h3>
+        <div class="item-meta">${formatBRL(item.product.price)} cada</div>
+        <div class="qty-stepper" data-qty-stepper style="transform: scale(.9); transform-origin: left;">
+          <button type="button" data-qty-minus aria-label="Diminuir quantidade">
+            <svg class="icon" aria-hidden="true"><use href="#icon-minus"></use></svg>
+          </button>
+          <input type="number" value="${item.qty}" min="1" max="${item.product.stock}" data-qty-input inputmode="numeric" aria-label="Quantidade">
+          <button type="button" data-qty-plus aria-label="Aumentar quantidade">
+            <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>
+          </button>
+        </div>
+      </div>
+      <div class="cart-item-controls">
+        <span class="cart-item-price">${formatBRL(item.lineTotal)}</span>
+        <button class="remove-link" data-remove="${item.id}">
+          <svg class="icon" aria-hidden="true" style="width:1em;height:1em;"><use href="#icon-trash"></use></svg>
+          Remover
+        </button>
+      </div>
+    </div>
+  `).join("");
+
+  document.getElementById("summary-subtotal").textContent = formatBRL(getCartSubtotal());
+  document.getElementById("summary-total").textContent = formatBRL(getCartSubtotal());
+
+  // qty steppers dentro do carrinho
+  listEl.querySelectorAll(".cart-item").forEach((row) => {
+    const id = row.getAttribute("data-id");
+    const input = row.querySelector("[data-qty-input]");
+    row.querySelector("[data-qty-minus]").addEventListener("click", () => {
+      updateCartQty(id, parseInt(input.value, 10) - 1);
+      renderCartPage();
+    });
+    row.querySelector("[data-qty-plus]").addEventListener("click", () => {
+      updateCartQty(id, parseInt(input.value, 10) + 1);
+      renderCartPage();
+    });
+    input.addEventListener("change", () => {
+      updateCartQty(id, parseInt(input.value, 10) || 1);
+      renderCartPage();
+    });
+  });
+
+  listEl.querySelectorAll("[data-remove]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      removeFromCart(btn.getAttribute("data-remove"));
+      renderCartPage();
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", renderCartPage);
+</script>
+</body>
+</html>
