@@ -43,8 +43,7 @@
 <header class="site-header">
   <div class="container">
     <a href="index.html" class="brand">
-      <img src="assets/images/logo.jpg" alt="Mimo Divino">
-      <span class="brand-word">Mimo <span>Divino</span></span>
+      <img src="assets/images/logo.png" alt="Mimo Divino" class="brand-logo">
     </a>
     <nav class="main-nav" id="main-nav">
       <a href="index.html#produtos">Produtos</a>
@@ -196,8 +195,7 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="index.html" class="brand">
-          <img src="assets/images/logo.jpg" alt="Mimo Divino">
-          <span class="brand-word">Mimo <span>Divino</span></span>
+          <img src="assets/images/logo.png" alt="Mimo Divino" class="brand-logo">
         </a>
         <p>Carinho que acalma. Presença que conforta.</p>
         <div class="footer-social">
@@ -252,7 +250,7 @@
   });
   document.getElementById("buy-now").addEventListener("click", (e) => {
     const qty = parseInt(document.querySelector('[data-qty-stepper] input').value || "1", 10);
-    addToCart(PRODUCT_ID, qty);
+    addToCart(PRODUCT_ID, qty, { silent: true });
     // segue normalmente para checkout.html pelo href
   });
 </script>
