@@ -62,7 +62,7 @@
   <section class="section-tight">
     <div class="container checkout-layout">
 
-      <form id="checkout-form" novalidate>
+      <form id="checkout-form" novalidate onsubmit="return false;">
 
         <div class="form-card">
           <h2><svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg> Seus dados</h2>
@@ -81,6 +81,12 @@
               <label for="phone">Telefone / WhatsApp</label>
               <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="(00) 00000-0000">
               <span class="error-msg">Informe um telefone para contato.</span>
+            </div>
+            <div class="field">
+              <label for="document">CPF</label>
+              <input type="text" id="document" name="document" required inputmode="numeric" placeholder="000.000.000-00" autocomplete="off">
+              <span class="hint">Exigido pelo Mercado Pago para processar o pagamento.</span>
+              <span class="error-msg">Informe um CPF válido.</span>
             </div>
           </div>
         </div>
@@ -130,18 +136,38 @@
 
         <div class="form-card">
           <h2><svg class="icon" aria-hidden="true"><use href="#icon-shield-check"></use></svg> Pagamento</h2>
-          <div class="payment-methods">
-            <label class="payment-option selected">
-              <input type="radio" name="payment" value="mercadopago" checked style="accent-color: var(--primary);">
-              <div>
-                <div class="opt-title">Mercado Pago</div>
-                <div class="opt-sub">Cartão de crédito, Pix ou boleto — escolha na próxima tela</div>
-              </div>
-            </label>
+
+          <p id="payment-gate" class="summary-note">
+            Preencha seu CEP acima e escolha o frete para liberar as formas de pagamento.
+          </p>
+
+          <div id="payment-tabs-wrap" hidden>
+            <div class="tab-buttons">
+              <button type="button" class="active" data-tab-target="cartao">Cartão</button>
+              <button type="button" data-tab-target="pix">Pix</button>
+              <button type="button" data-tab-target="boleto">Boleto</button>
+            </div>
+
+            <div class="tab-panel active" data-tab-panel="cartao">
+              <div id="cardPaymentBrick_container"></div>
+            </div>
+
+            <div class="tab-panel" data-tab-panel="pix">
+              <p>Pague na hora com o app do seu banco. Assim que o pagamento cair, o pedido é confirmado automaticamente.</p>
+              <button type="button" class="btn btn-primary btn-lg" id="pay-pix">Gerar Pix</button>
+            </div>
+
+            <div class="tab-panel" data-tab-panel="boleto">
+              <p>O boleto pode levar até 2 dias úteis para compensar depois de pago.</p>
+              <button type="button" class="btn btn-primary btn-lg" id="pay-boleto">Gerar boleto</button>
+            </div>
           </div>
+
+          <div id="payment-result" hidden></div>
+
           <p class="payment-note">
             <svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg>
-            Você será redirecionado para o ambiente seguro do Mercado Pago para concluir o pagamento. Nenhum dado de cartão é armazenado neste site.
+            Pagamento processado com segurança pelo Mercado Pago. Nenhum dado de cartão é armazenado neste site.
           </p>
         </div>
 
@@ -163,10 +189,7 @@
             <span>Total</span>
             <span id="order-total">R$ 0,00</span>
           </div>
-          <button type="submit" form="checkout-form" class="btn btn-primary btn-lg btn-block" id="place-order" style="margin-top:1.2rem;">
-            Finalizar pedido
-          </button>
-          <p class="summary-note text-center">Compra 100% segura e protegida.</p>
+          <p class="summary-note text-center" style="margin-top:1rem;">Escolha a forma de pagamento ao lado para concluir.</p>
         </div>
       </aside>
 
@@ -190,5 +213,7 @@
 <script src="js/cart.js"></script>
 <script src="js/main.js"></script>
 <script src="js/checkout.js"></script>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script src="js/checkout-payment.js"></script>
 </body>
 </html>
