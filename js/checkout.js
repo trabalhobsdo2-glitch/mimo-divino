@@ -1,12 +1,14 @@
 /**
- * MIMO DIVINO — checkout
+ * MIMO DIVINO — checkout (dados, endereço e frete)
  * ------------------------------------------------------------------
- * Este arquivo cuida de 4 coisas:
+ * Este arquivo cuida de 3 coisas:
  *   1) Preencher o resumo do pedido a partir do carrinho (products.js + cart.js)
  *   2) Buscar endereço pelo CEP (API pública ViaCEP — gratuita, sem chave)
  *   3) Calcular uma ESTIMATIVA de frete (placeholder — ver aviso abaixo)
- *   4) Enviar o pedido para a função serverless /api/create-preference,
- *      que cria a preferência no Mercado Pago e redireciona para o pagamento.
+ *
+ * O pagamento em si (cartão via Card Payment Brick, Pix e boleto via
+ * API de Orders) é tratado em js/checkout-payment.js, que assume a
+ * partir do momento em que o frete é escolhido aqui.
  *
  * ⚠️ FRETE — IMPORTANTE
  * A função calculateShippingEstimate() abaixo é um placeholder por região,
@@ -16,8 +18,6 @@
  * bater com o custo real de envio.
  * ------------------------------------------------------------------
  */
-
-const ORDER_KEY = "mimo_divino_last_order_v1";
 
 /* ---------------- Resumo do pedido ---------------- */
 function renderOrderSummary() {
@@ -44,8 +44,11 @@ function renderOrderSummary() {
   updateOrderTotal();
 }
 
+function getOrderTotal() {
+  return getCartSubtotal() + (getSelectedShippingPrice() || 0);
+}
+
 function updateOrderTotal() {
-  const subtotal = getCartSubtotal();
   const shipping = getSelectedShippingPrice();
   const totalEl = document.getElementById("order-total");
   const shippingEl = document.getElementById("order-shipping");
@@ -53,7 +56,7 @@ function updateOrderTotal() {
     shippingEl.textContent = shipping === null ? "Informe o CEP" : formatBRL(shipping);
   }
   if (totalEl) {
-    totalEl.textContent = formatBRL(subtotal + (shipping || 0));
+    totalEl.textContent = formatBRL(getOrderTotal());
   }
 }
 
@@ -107,6 +110,10 @@ function getSelectedShippingPrice() {
   return currentShipping[selectedShippingKey].price;
 }
 
+function getSelectedShippingMethod() {
+  return selectedShippingKey;
+}
+
 function renderShippingOptions() {
   const wrap = document.getElementById("shipping-options");
   if (!wrap || !currentShipping) return;
@@ -138,6 +145,7 @@ function renderShippingOptions() {
       selectedShippingKey = el.getAttribute("data-shipping");
       renderShippingOptions();
       updateOrderTotal();
+      if (typeof onShippingReady === "function") onShippingReady();
     });
   });
 }
@@ -171,75 +179,16 @@ function validateCheckoutForm(form) {
   return valid;
 }
 
-/* ---------------- Envio do pedido → Mercado Pago ---------------- */
-async function submitOrder(form) {
-  const button = document.getElementById("place-order");
-  const originalLabel = button.innerHTML;
-  button.disabled = true;
-  button.innerHTML = "Processando...";
-
-  const payload = {
-    customer: {
-      name: form.querySelector("#full-name").value.trim(),
-      email: form.querySelector("#email").value.trim(),
-      phone: form.querySelector("#phone").value.trim(),
-    },
-    address: {
-      cep: form.querySelector("#cep").value.trim(),
-      street: form.querySelector("#street").value.trim(),
-      number: form.querySelector("#number").value.trim(),
-      complement: form.querySelector("#complement").value.trim(),
-      neighborhood: form.querySelector("#neighborhood").value.trim(),
-      city: form.querySelector("#city").value.trim(),
-      state: form.querySelector("#state").value.trim(),
-    },
-    shipping: {
-      method: selectedShippingKey,
-      price: getSelectedShippingPrice(),
-    },
-    items: getCartDetailed().map((item) => ({
-      id: item.product.id,
-      title: item.product.fullName,
-      quantity: item.qty,
-      unit_price: item.product.price,
-    })),
-  };
-
-  localStorage.setItem(ORDER_KEY, JSON.stringify(payload));
-
-  try {
-    const res = await fetch("/api/create-preference", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) throw new Error("Falha ao criar preferência de pagamento.");
-
-    const data = await res.json();
-    if (data && data.init_point) {
-      window.location.href = data.init_point;
-      return;
-    }
-    throw new Error("Resposta inesperada do servidor de pagamento.");
-  } catch (err) {
-    console.warn(err);
-    button.disabled = false;
-    button.innerHTML = originalLabel;
-    showCheckoutNotice(
-      "O pagamento ainda não está configurado neste ambiente. Assim que as credenciais do Mercado Pago forem adicionadas no Vercel, esta etapa vai redirecionar automaticamente para o pagamento seguro."
-    );
-  }
-}
-
-function showCheckoutNotice(message) {
+function showCheckoutNotice(message, isError) {
   let el = document.getElementById("checkout-notice");
   if (!el) {
     el = document.createElement("div");
     el.id = "checkout-notice";
     el.className = "payment-note";
-    document.querySelector(".payment-methods").after(el);
+    const anchor = document.querySelector(".payment-tabs") || document.querySelector(".payment-methods");
+    if (anchor) anchor.after(el);
   }
+  el.style.borderColor = isError ? "var(--error)" : "";
   el.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-shield-check"></use></svg><span>${message}</span>`;
 }
 
@@ -260,19 +209,8 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedShippingKey = "standard";
       renderShippingOptions();
       updateOrderTotal();
+      if (typeof onShippingReady === "function") onShippingReady();
       document.getElementById("number").focus();
-    });
-  }
-
-  const form = document.getElementById("checkout-form");
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (!validateCheckoutForm(form)) {
-        showToast("Confira os campos destacados");
-        return;
-      }
-      submitOrder(form);
     });
   }
 });
