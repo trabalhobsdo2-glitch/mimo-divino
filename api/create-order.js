@@ -51,6 +51,10 @@ module.exports = async (req, res) => {
       res.status(400).json({ error: "Dados do cliente incompletos (e-mail e CPF são obrigatórios)." });
       return;
     }
+    if (!customer.phone || String(customer.phone).replace(/\D/g, "").length < 10) {
+      res.status(400).json({ error: "Informe um telefone válido com DDD." });
+      return;
+    }
 
     const itemsTotal = items.reduce(
       (sum, item) => sum + Number(item.unit_price) * Number(item.quantity),
@@ -85,6 +89,7 @@ module.exports = async (req, res) => {
       customer: {
         name: customer.name || "Cliente Mimo Divino",
         email: customer.email,
+        phone: String(customer.phone || "").replace(/\D/g, ""),
         document: { type: "cpf", number: String(payment.document).replace(/\D/g, "") },
       },
       items: beehiveItems,
