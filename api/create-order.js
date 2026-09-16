@@ -3,27 +3,22 @@ const crypto = require("crypto");
 /**
  * POST /api/create-order
  * ------------------------------------------------------------------
- * Checkout Transparente — cria a "order" no Mercado Pago (API de
- * Orders, o padrão atual para o Checkout Transparente) com a
- * transação de pagamento já associada: cartão, Pix ou boleto.
+ * Cria a transação Pix na Beehive Pay — único meio de pagamento deste
+ * checkout. Não há dado sensível a tokenizar, então os dados do pagador
+ * coletados no formulário são enviados direto.
  *
- * O cliente nunca sai do site: o Card Payment Brick (no front-end)
- * tokeniza o cartão com segurança, e para Pix/boleto não existe
- * nenhum dado sensível a tokenizar — só precisamos dos dados do
- * pagador, que já são coletados no formulário de checkout.
- *
- * COMO ATIVAR (depois de criar sua conta Mercado Pago):
+ * COMO ATIVAR (depois de criar sua conta Beehive Pay):
  *   1. Painel do Vercel → seu projeto → Settings → Environment Variables
- *   2. Adicione DUAS variáveis (a Transparente precisa das duas,
- *      diferente do Checkout Pro que só precisava do Access Token):
- *        MP_ACCESS_TOKEN  → chave privada (usada aqui, no servidor)
- *        MP_PUBLIC_KEY    → chave pública (usada no navegador, via /api/config)
+ *   2. Adicione DUAS variáveis:
+ *        BEEHIVE_SECRET_KEY  → chave secreta (usada aqui, no servidor)
+ *        BEEHIVE_PUBLIC_KEY  → chave pública (usada no navegador, via /api/config)
  *   3. Redeploy.
  *
- * Referência oficial:
- * https://www.mercadopago.com.br/developers/pt/docs/checkout-api-orders/overview
+ * Referência oficial: https://docs.beehivehub.io/api-reference
  * ------------------------------------------------------------------
  */
+
+const BEEHIVE_API = "https://api.conta.paybeehive.com.br/v1";
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
@@ -31,11 +26,11 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const accessToken = process.env.MP_ACCESS_TOKEN;
-  if (!accessToken) {
+  const secretKey = process.env.BEEHIVE_SECRET_KEY;
+  if (!secretKey) {
     res.status(501).json({
       error:
-        "MP_ACCESS_TOKEN não configurado. Adicione essa variável de ambiente no painel do Vercel para ativar os pagamentos.",
+        "BEEHIVE_SECRET_KEY não configurado. Adicione essa variável de ambiente no painel do Vercel para ativar os pagamentos.",
     });
     return;
   }
@@ -52,78 +47,78 @@ module.exports = async (req, res) => {
       res.status(400).json({ error: "Meio de pagamento não informado." });
       return;
     }
+    if (!customer.email || !payment.document) {
+      res.status(400).json({ error: "Dados do cliente incompletos (e-mail e CPF são obrigatórios)." });
+      return;
+    }
 
     const itemsTotal = items.reduce(
       (sum, item) => sum + Number(item.unit_price) * Number(item.quantity),
       0
     );
     const shippingPrice = Number(shipping.price) || 0;
-    const totalAmount = (itemsTotal + shippingPrice).toFixed(2);
+    const totalAmountCents = Math.round((itemsTotal + shippingPrice) * 100);
 
-    // Monta o payment_method de acordo com o meio escolhido.
-    // Referência dos valores de "type" por meio de pagamento:
-    //   cartão de crédito -> "credit_card" | cartão de débito -> "debit_card"
-    //   Pix -> "bank_transfer" (id sempre "pix")
-    //   Boleto -> "ticket" (id sempre "boleto")
-    const paymentMethod = {
-      id: payment.payment_method_id,
-      type: payment.type,
-    };
+    const orderId = `mimodivino-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`;
+    const origin = req.headers.origin || `https://${req.headers.host}`;
 
-    if (payment.type === "credit_card" || payment.type === "debit_card") {
-      paymentMethod.token = payment.token;
-      paymentMethod.installments = Number(payment.installments) || 1;
+    // "type" chega do front-end já no formato da Beehive: credit_card | pix | boleto
+    const beehiveItems = items.map((item) => ({
+      title: item.title,
+      unitPrice: Math.round(Number(item.unit_price) * 100),
+      quantity: Number(item.quantity),
+      tangible: true,
+    }));
+
+    if (shippingPrice > 0) {
+      beehiveItems.push({
+        title: "Frete",
+        unitPrice: Math.round(shippingPrice * 100),
+        quantity: 1,
+        tangible: false,
+      });
     }
 
-    const payer = { email: customer.email || "" };
-
-    if (payment.identification && payment.identification.number) {
-      payer.identification = payment.identification;
-    }
-
-    // Boleto exige nome e endereço completo do pagador.
-    if (payment.type === "ticket") {
-      const parts = (customer.name || "").trim().split(/\s+/);
-      payer.first_name = parts[0] || "Cliente";
-      payer.last_name = parts.slice(1).join(" ") || "Mimo Divino";
-      payer.address = {
-        street_name: address.street || "",
-        street_number: address.number || "S/N",
-        zip_code: (address.cep || "").replace(/\D/g, ""),
-        neighborhood: address.neighborhood || "",
-        state: address.state || "",
-        city: address.city || "",
-      };
-    }
-
-    const transactionPayment = {
-      amount: totalAmount,
-      payment_method: paymentMethod,
+    const transactionBody = {
+      amount: totalAmountCents,
+      paymentMethod: payment.type, // "credit_card" | "pix" | "boleto"
+      customer: {
+        name: customer.name || "Cliente Mimo Divino",
+        email: customer.email,
+        document: { type: "cpf", number: String(payment.document).replace(/\D/g, "") },
+      },
+      items: beehiveItems,
+      metadata: {
+        provider: "mimo-divino",
+        user_email: customer.email,
+        order_id: orderId,
+        checkout_url: `${origin}/checkout.html`,
+        shop_url: origin,
+      },
+      postbackUrl: `${origin}/api/webhook`,
     };
 
-    const orderBody = {
-      type: "online",
-      processing_mode: "automatic",
-      total_amount: totalAmount,
-      external_reference: `mimodivino-${Date.now()}`,
-      payer,
-      transactions: { payments: [transactionPayment] },
-    };
+    if (payment.type !== "pix") {
+      res.status(400).json({ error: "Este checkout só aceita Pix." });
+      return;
+    }
+    transactionBody.pix = { expiresInSeconds: 900 };
 
-    const mpRes = await fetch("https://api.mercadopago.com/v1/orders", {
+    const authHeader = "Basic " + Buffer.from(`${secretKey}:x`).toString("base64");
+
+    const beehiveRes = await fetch(`${BEEHIVE_API}/transactions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-        "X-Idempotency-Key": crypto.randomUUID(),
+        Authorization: authHeader,
       },
-      body: JSON.stringify(orderBody),
+      body: JSON.stringify(transactionBody),
     });
 
-    const data = await mpRes.json();
+    const data = await beehiveRes.json();
 
-    if (!mpRes.ok) {
-      console.error("Mercado Pago respondeu com erro:", JSON.stringify(data));
+    if (!beehiveRes.ok) {
+      console.error("Beehive Pay respondeu com erro:", JSON.stringify(data));
       res.status(502).json({
         error:
           (data && (data.message || data.error)) ||
