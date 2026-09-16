@@ -142,24 +142,9 @@
           </p>
 
           <div id="payment-tabs-wrap" hidden>
-            <div class="tab-buttons">
-              <button type="button" class="active" data-tab-target="cartao">Cartão</button>
-              <button type="button" data-tab-target="pix">Pix</button>
-              <button type="button" data-tab-target="boleto">Boleto</button>
-            </div>
-
-            <div class="tab-panel active" data-tab-panel="cartao">
-              <div id="cardPaymentBrick_container"></div>
-            </div>
-
-            <div class="tab-panel" data-tab-panel="pix">
+            <div class="tab-panel active" data-tab-panel="pix">
               <p>Pague na hora com o app do seu banco. Assim que o pagamento cair, o pedido é confirmado automaticamente.</p>
               <button type="button" class="btn btn-primary btn-lg" id="pay-pix">Gerar Pix</button>
-            </div>
-
-            <div class="tab-panel" data-tab-panel="boleto">
-              <p>O boleto pode levar até 2 dias úteis para compensar depois de pago.</p>
-              <button type="button" class="btn btn-primary btn-lg" id="pay-boleto">Gerar boleto</button>
             </div>
           </div>
 
@@ -167,7 +152,7 @@
 
           <p class="payment-note">
             <svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg>
-            Pagamento processado com segurança pelo Mercado Pago. Nenhum dado de cartão é armazenado neste site.
+            Pagamento processado com segurança pela Beehive Pay. Nenhum dado de cartão é armazenado neste site.
           </p>
         </div>
 
@@ -203,7 +188,7 @@
       <span>© 2026 Mimo Divino. Todos os direitos reservados.</span>
       <div class="payment-badges">
         <svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg>
-        <span>Pagamento processado com segurança via Mercado Pago</span>
+        <span>Pagamento processado com segurança via Beehive Pay</span>
       </div>
     </div>
   </div>
@@ -213,7 +198,6 @@
 <script src="js/cart.js"></script>
 <script src="js/main.js"></script>
 <script src="js/checkout.js"></script>
-<script src="https://sdk.mercadopago.com/js/v2"></script>
 <script src="js/checkout-payment.js"></script>
 </body>
 </html>
