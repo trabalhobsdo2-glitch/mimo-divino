@@ -40,7 +40,7 @@
         <svg class="icon" aria-hidden="true" style="width:2rem;height:2rem;"><use href="#icon-check-circle"></use></svg>
       </span>
       <h1 id="status-title">Recebemos seu pedido</h1>
-      <p class="lede" id="status-text" style="margin-inline:auto;">Assim que o pagamento for confirmado pelo Pagar.me, você recebe um e-mail com os detalhes do seu Mimo Divino.</p>
+      <p class="lede" id="status-text" style="margin-inline:auto;">Assim que o pagamento Pix for confirmado, você recebe um e-mail com os detalhes do seu Mimo Divino.</p>
       <a href="index.html" class="btn btn-primary btn-lg" style="margin-top:1rem;">Voltar à loja</a>
     </div>
   </section>
@@ -52,7 +52,7 @@
       <span>© 2026 Mimo Divino. Todos os direitos reservados.</span>
       <div class="payment-badges">
         <svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg>
-        <span>Pagamento processado com segurança via Pagar.me</span>
+        <span>Pagamento processado com segurança via Pix</span>
       </div>
     </div>
   </div>
@@ -61,7 +61,7 @@
 <script src="js/products.js"></script>
 <script src="js/cart.js"></script>
 <script>
-  // Lê o retorno do Pagar.me (status=approved|pending|failure) e ajusta a mensagem.
+  // Lê o status retornado na URL (status=approved|pending|failure) e ajusta a mensagem.
   const params = new URLSearchParams(window.location.search);
   const status = params.get("status") || params.get("collection_status");
 
