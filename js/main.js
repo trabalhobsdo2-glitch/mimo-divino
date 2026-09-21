@@ -8,15 +8,33 @@ function initNavToggle() {
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".main-nav");
   if (!toggle || !nav) return;
-  toggle.addEventListener("click", () => {
-    const isOpen = nav.classList.toggle("open");
+
+  let overlay = document.getElementById("nav-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.className = "nav-overlay";
+    overlay.id = "nav-overlay";
+    document.body.appendChild(overlay);
+  }
+
+  const iconUse = toggle.querySelector("use");
+
+  function setOpen(isOpen) {
+    nav.classList.toggle("open", isOpen);
+    overlay.classList.toggle("open", isOpen);
+    document.body.classList.toggle("nav-open", isOpen);
     toggle.setAttribute("aria-expanded", String(isOpen));
-  });
+    toggle.setAttribute("aria-label", isOpen ? "Fechar menu" : "Abrir menu");
+    if (iconUse) iconUse.setAttribute("href", isOpen ? "#icon-close" : "#icon-menu");
+  }
+
+  toggle.addEventListener("click", () => setOpen(!nav.classList.contains("open")));
+  overlay.addEventListener("click", () => setOpen(false));
   nav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      nav.classList.remove("open");
-      toggle.setAttribute("aria-expanded", "false");
-    });
+    link.addEventListener("click", () => setOpen(false));
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setOpen(false);
   });
 }
 
