@@ -61,6 +61,11 @@ function updateOrderTotal() {
 }
 
 /* ---------------- CEP → endereço (ViaCEP, gratuito) ---------------- */
+function formatCEPInput(value) {
+  const clean = value.replace(/\D/g, "").slice(0, 8);
+  return clean.length > 5 ? `${clean.slice(0, 5)}-${clean.slice(5)}` : clean;
+}
+
 async function lookupCEP(cep) {
   const clean = cep.replace(/\D/g, "");
   if (clean.length !== 8) return null;
@@ -192,25 +197,84 @@ function showCheckoutNotice(message, isError) {
   el.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#icon-shield-check"></use></svg><span>${message}</span>`;
 }
 
+/* ---------------- Máscaras simples (telefone e CPF) ---------------- */
+function formatPhoneInput(value) {
+  const clean = value.replace(/\D/g, "").slice(0, 11);
+  if (clean.length <= 2) return clean;
+  if (clean.length <= 7) return `(${clean.slice(0, 2)}) ${clean.slice(2)}`;
+  return `(${clean.slice(0, 2)}) ${clean.slice(2, 7)}-${clean.slice(7)}`;
+}
+
+function formatCPFInput(value) {
+  const clean = value.replace(/\D/g, "").slice(0, 11);
+  return clean
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
 /* ---------------- Inicialização ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
   renderOrderSummary();
 
-  const cepField = document.getElementById("cep");
-  if (cepField) {
-    cepField.addEventListener("blur", async () => {
-      const data = await lookupCEP(cepField.value);
-      if (!data) return;
-      document.getElementById("street").value = data.logradouro || "";
-      document.getElementById("neighborhood").value = data.bairro || "";
-      document.getElementById("city").value = data.localidade || "";
-      document.getElementById("state").value = data.uf || "";
-      currentShipping = calculateShippingEstimate(data.uf);
-      selectedShippingKey = "standard";
-      renderShippingOptions();
-      updateOrderTotal();
-      if (typeof onShippingReady === "function") onShippingReady();
-      document.getElementById("number").focus();
+  const phoneField = document.getElementById("phone");
+  if (phoneField) {
+    phoneField.addEventListener("input", () => {
+      phoneField.value = formatPhoneInput(phoneField.value);
     });
   }
+  const cpfField = document.getElementById("document");
+  if (cpfField) {
+    cpfField.addEventListener("input", () => {
+      cpfField.value = formatCPFInput(cpfField.value);
+    });
+  }
+
+  const cepField = document.getElementById("cep");
+  if (!cepField) return;
+
+  let lastLookedUp = "";
+
+  async function runCEPLookup() {
+    const clean = cepField.value.replace(/\D/g, "");
+    if (clean.length !== 8 || clean === lastLookedUp) return;
+
+    setFieldError(cepField, false);
+    const hint = cepField.closest(".field").querySelector(".hint");
+    const hintOriginal = hint ? hint.textContent : "";
+    if (hint) hint.textContent = "Buscando endereço...";
+
+    const data = await lookupCEP(clean);
+
+    if (!data) {
+      lastLookedUp = "";
+      setFieldError(cepField, true);
+      if (hint) hint.textContent = hintOriginal;
+      const errMsg = cepField.closest(".field").querySelector(".error-msg");
+      if (errMsg) errMsg.textContent = "CEP não encontrado. Confira e tente de novo.";
+      return;
+    }
+
+    lastLookedUp = clean;
+    if (hint) hint.textContent = hintOriginal;
+    document.getElementById("street").value = data.logradouro || "";
+    document.getElementById("neighborhood").value = data.bairro || "";
+    document.getElementById("city").value = data.localidade || "";
+    document.getElementById("state").value = data.uf || "";
+    currentShipping = calculateShippingEstimate(data.uf);
+    selectedShippingKey = "standard";
+    renderShippingOptions();
+    updateOrderTotal();
+    if (typeof onShippingReady === "function") onShippingReady();
+
+    // Só rouba o foco se o número ainda estiver vazio, pra não atrapalhar quem já está digitando.
+    const numberField = document.getElementById("number");
+    if (numberField && !numberField.value) numberField.focus();
+  }
+
+  cepField.addEventListener("input", () => {
+    cepField.value = formatCEPInput(cepField.value);
+    if (cepField.value.replace(/\D/g, "").length === 8) runCEPLookup();
+  });
+  cepField.addEventListener("blur", runCEPLookup);
 });
