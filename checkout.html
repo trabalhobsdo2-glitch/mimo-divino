@@ -13,6 +13,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="icon-cart" viewBox="0 0 24 24"><path d="M3 4h2.2l1 12.2A2 2 0 0 0 8.2 18h9.4a2 2 0 0 0 2-1.7L21 8H6"/><circle cx="9.5" cy="21" r="1.4"/><circle cx="17.5" cy="21" r="1.4"/></symbol>
   <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
   <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="1.6"/><path d="M7.5 10.5V7.8a4.5 4.5 0 0 1 9 0v2.7"/></symbol>
   <symbol id="icon-truck" viewBox="0 0 24 24"><path d="M2.5 6.5h11v10h-11z"/><path d="M13.5 10.5h4l3 3v3h-7z"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></symbol>
   <symbol id="icon-package" viewBox="0 0 24 24"><path d="M3.5 8 12 3.5 20.5 8 12 12.5 3.5 8Z"/><path d="M3.5 8v9L12 21.5 20.5 17V8"/><path d="M12 12.5V21.5"/></symbol>
@@ -85,7 +86,7 @@
             <div class="field">
               <label for="document">CPF</label>
               <input type="text" id="document" name="document" required inputmode="numeric" placeholder="000.000.000-00" autocomplete="off">
-              <span class="hint">Exigido pelo Pagar.me para processar o pagamento.</span>
+              <span class="hint">Exigido para processar o pagamento via Pix.</span>
               <span class="error-msg">Informe um CPF válido.</span>
             </div>
           </div>
@@ -152,7 +153,7 @@
 
           <p class="payment-note">
             <svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg>
-            Pagamento processado com segurança pela Pagar.me. Nenhum dado de cartão é armazenado neste site.
+            Pagamento processado com segurança via Pix. Nenhum dado sensível é armazenado neste site.
           </p>
         </div>
 
@@ -188,7 +189,7 @@
       <span>© 2026 Mimo Divino. Todos os direitos reservados.</span>
       <div class="payment-badges">
         <svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg>
-        <span>Pagamento processado com segurança via Pagar.me</span>
+        <span>Pagamento processado com segurança via Pix</span>
       </div>
     </div>
   </div>
