@@ -8,7 +8,7 @@
  * ATENÇÃO — valores assumidos que você deve conferir antes de publicar:
  *  - price: R$ 29,90 para os dois produtos (era o valor do briefing original,
  *    que previa um único produto).
- *  - stock: 31 unidades para cada um (mesma origem do briefing original).
+ *  - stock: Maria 11 / Jesus 9 unidades (ajustado a pedido do lojista).
  *  - battery: "3 pilhas pequenas (não inclusas)" — confirmado visualmente
  *    nas fotos do passo a passo, mas confirme o tamanho exato (AA ou AAA)
  *    antes de publicar.
@@ -22,7 +22,7 @@ const PRODUCTS = {
     fullName: "Pelúcia Maria — Presença de Paz",
     tagline: "Uma presença que acalma o coração.",
     price: 29.90,
-    stock: 31,
+    stock: 11,
     weightKg: 0.35,
     image: "assets/images/maria-produto.jpg",
     gallery: [
@@ -46,7 +46,7 @@ const PRODUCTS = {
     fullName: "Pelúcia Jesus — Presença de Luz",
     tagline: "Uma presença que acolhe e reconforta.",
     price: 29.90,
-    stock: 31,
+    stock: 9,
     weightKg: 0.32,
     image: "assets/images/jesus-produto.jpg",
     gallery: [
